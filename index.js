@@ -109,11 +109,12 @@ const drawerObserverCallback = async function(mutationsList, observer) {
                 }
             }
             // --- 抽屉关闭逻辑 ---
-            else if (currentDisplayState === 'none' && metadataHashOnDrawerOpen !== 'closing_in_progress') {
+            else if (currentDisplayState === 'none' && metadataHashOnDrawerOpen !== null && metadataHashOnDrawerOpen !== 'closing_in_progress') {
                 logDebug('[聊天自动备份] 表格抽屉已关闭。检查 chatMetadata 是否变化...');
                 const previousHash = metadataHashOnDrawerOpen;
+                // 立即将标志设置为处理中，防止重复触发
                 metadataHashOnDrawerOpen = 'closing_in_progress'; // 防止动画期间重复触发
-
+                
                 const context = getContext();
                 let currentMetadataHash = null;
                 if (context && context.chatMetadata) {
@@ -150,7 +151,11 @@ const drawerObserverCallback = async function(mutationsList, observer) {
                     logDebug('[聊天自动备份] chatMetadata 哈希值一致，不触发备份。');
                 }
                 
-                metadataHashOnDrawerOpen = null; // 为下一次打开重置
+                // 等待一段时间后才重置，防止多次触发关闭处理
+                setTimeout(() => {
+                    metadataHashOnDrawerOpen = null; // 为下一次打开重置
+                    logDebug('[聊天自动备份] 抽屉关闭处理完毕，重置哈希状态');
+                }, 500);
             }
         }
     }
@@ -1991,8 +1996,8 @@ function setupTableDrawerObserver() {
     logDebug('[聊天自动备份] 开始设置表格抽屉监听器...');
     
     // 最大重试次数和间隔
-    const MAX_RETRIES = 5;
-    const RETRY_INTERVAL = 400; // 毫秒
+    const MAX_RETRIES = 10;
+    const RETRY_INTERVAL = 500; // 毫秒
     let retryCount = 0;
     
     function attemptToSetupObserver() {
