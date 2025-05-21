@@ -245,7 +245,7 @@ function constructJsonlString(metadata, messages) {
 }
 
 // 扩展名和设置初始化
-const PLUGIN_NAME = 'chat-history-backupY3';
+const PLUGIN_NAME = 'chat-history-backupQ4';
 const DEFAULT_SETTINGS = {
     maxTotalBackups: 10, // 整个系统保留的最大备份数量 (增加默认值，避免频繁清理)
     backupDebounceDelay: 1500, // 防抖延迟时间 (毫秒) (增加默认值，更稳定)
